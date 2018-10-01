@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { getCode, oauthLogin, login } from './utils/oauth';
+import { getCode, oauthLogin, getAccessToken, shortenCode } from './utils/oauth';
 
 class App extends Component {
   constructor(props) {
@@ -11,18 +11,19 @@ class App extends Component {
     }
   }
 
-  /* componentDidMount() {
+  componentDidMount() {
     this.timerID = setInterval(
       () => getCode(),
       1000
     );
-  } */
+  }
 
   render() {
     return (
       <div className="App">
-        <button onClick={login}>accessToken</button>
-        <p>{this.state.code}</p>
+        <button onClick={oauthLogin}>Get Code</button>
+        <button onClick={shortenCode}>Shorten Code</button>
+        <button onClick={getAccessToken}>Get AccessToken</button>
       </div>
     );
   }
