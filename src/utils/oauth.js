@@ -2,7 +2,7 @@ import {JSO} from 'jso';
 
 let jso = new JSO({
 	providerID: "bexio",
-	client_id: "XXXXXXXXXXXXXXXXXXXXXXXX",
+	client_id: "XXXXXXXXXXXXXXXXXXXXX",
 	redirect_uri: "http://localhost:3000/", // The URL where you is redirected back, and where you perform run the callback() function.
 	authorization: "https://office.bexio.com/oauth/authorize",
     scopes: { request: ["article_show"]},
@@ -35,21 +35,22 @@ export const oauthLogin = () => {
 
 export const shortenCode = () => {
     const codeLong = localStorage.getItem('codeLong');
-    const codeShort = codeLong.match("code=(.*),"); //does not work
-    localStorage.setItem('code', codeShort);
+    const codeShort = codeLong.match("code=(.*),");
+    localStorage.setItem('code', codeShort[1]);
 }
 
 export const getAccessToken = () => {
     const code = localStorage.getItem('code');
-    const request = new Request('https://office.bexio.com/oauth/access_token', {
+    const url = 'https://office.bexio.com/oauth/access_token';
+    fetch(url, { 
+        method: 'post', 
         headers: new Headers({
-            'method': 'post',
-            'client_id': 'XXXXXXXXXXXXXXXXXXXXXXXX',
+            'X-Requested-With': null, //needs further testing
+            'client_id': 'XXXXXXXXXXXXXXXXXXXXX',
             'redirect_uri': 'http://localhost:3000/',
-            'client_secret': 'XXXXXXXXXXXXXXXXXXXXXXXX',
+            'client_secret': 'XXXXXXXXXXXXXXXXXXXXX',
             'code': code
-        })
-    });
-    fetch(request).then(response => {return response.json()}).then(jsonResponse => console.log(jsonResponse));
+        }) 
+      });
 }
 
