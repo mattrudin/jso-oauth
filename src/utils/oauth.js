@@ -1,13 +1,16 @@
 import {JSO} from 'jso';
 
+const clientID = 'XXXXXXXXXXXXXXXXXXXXXXXXX';
+const clientSecret = 'XXXXXXXXXXXXXXXXXXXXXXXXX';
+
 let jso = new JSO({
 	providerID: "bexio",
-	client_id: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+	client_id: clientID,
 	redirect_uri: "http://localhost:3000/",
 	authorization: "https://office.bexio.com/oauth/authorize/",
     scopes: { request: ["article_show"]},
     response_type: 'code',
-	client_secret: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+	client_secret: clientSecret,
     token: "https://office.bexio.com/oauth/access_token/",
     request: { state: '1234567890'}
 });
@@ -39,14 +42,14 @@ export const shortenCode = () => {
 
 export const getAccessToken = () => {
     
+    //no 'access-control-allow-origin' header is present on the requested resource.
+
     let http = new XMLHttpRequest();
     const url = 'https://office.bexio.com/oauth/access_token/';
-    const userID = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
     const redirect_uri = 'http://localhost:3000/';
-    const userSecret = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
     const code = localStorage.getItem('code');
 
-    const params = `client_id=${userID}&redirect_uri=${redirect_uri}&client_secret=${userSecret}&code=${code}`;
+    const params = `client_id=${clientID}&redirect_uri=${redirect_uri}&client_secret=${clientSecret}&code=${code}`;
     http.open('POST', url, true);
 
     http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
