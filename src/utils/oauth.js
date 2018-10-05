@@ -2,31 +2,22 @@ import {JSO} from 'jso';
 
 const clientID = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 const clientSecret = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+ 
 
-export async function loginFunction() {
-   // setLoginData(clientIDinput, clientSecretinput);
-    clearStorage();
-    await oauthLogin();
-    await getCode();
-    await shortenCode();
-    await getAccessToken();
-    alert('Async function complete');
-}
-
-
-export const clearStorage = () => {
-    localStorage.clear();
-}
-
-export const getCode = () => {
+const getAccess = () => {
     let accessCode = '';
     if(!accessCode) {
-        const codeLong = copyCodeFromUrl();
-        accessCode = shortenCode(codeLong);
+        const codeLong = window.location.href.match(/code=([^&]*)/);
+        if(codeLong) {
+            const codeShort = codeLong.match("code=(.*),");
+            const code = codeShort[1];
+            getAccessToken(code);
+        } else {
+            return
+        }
     } else {
         return
     }
-    return accessCode;
 }
 
 
@@ -45,16 +36,7 @@ export const oauthLogin = () => {
     jso.getToken();
 }
 
-const copyCodeFromUrl = () => {
-    const accessCode = window.location.href.match(/code=([^&]*)/);
-    return accessCode;
-}
 
-const shortenCode = (codeLong) => {
-    const codeShort = codeLong.match("code=(.*),");
-    const code = codeShort[1];
-    return code;
-}
 
 export const getAccessToken = (code) => {
     
