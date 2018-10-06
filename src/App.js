@@ -6,8 +6,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ClientID: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-      ClientSecret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+      ClientID: '2997263914.apps.bexio.com',
+      ClientSecret: 'WquLo3P4/XiAaG6qvRMi117uQdg=',
       AccessToken: '',
       Organisation: ''
     };
@@ -41,10 +41,10 @@ class App extends Component {
   }
 
   getAccess() {
-    let codeLong = window.location.href.match(/code=([^&]*)/);
-    if(codeLong) {
+    let isCode = window.location.href.match(/code=([^&]*)/);
+    if(isCode) {
       clearInterval(this.timerID);
-      let code = codeLong[0].slice(5);
+      let code = isCode[0].slice(5);
       this.getAccessToken(code);
     }
   }
@@ -53,7 +53,7 @@ class App extends Component {
     
     //no 'access-control-allow-origin' header is present on the requested resource.
 
-    let http = new XMLHttpRequest();
+    const http = new XMLHttpRequest();
     const url = 'https://office.bexio.com/oauth/access_token/';
     const redirect_uri = 'http://localhost:3000/';
 
@@ -61,6 +61,8 @@ class App extends Component {
     http.open('POST', url, true);
 
     http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    //http.setRequestHeader('Access-Control-Allow-Origin', 'http://localhost:3000'); does not work
+    //http.withCredentials = true;
 
     http.onreadystatechange = () => {
         if(http.readyState === 4 && http.status === 200) {
@@ -71,7 +73,7 @@ class App extends Component {
               AccessToken: accessToken,
               Organisation: organisation
             });
-            alert('got accessToken');
+            alert('AccessToken successfully received');
         }
     }
     http.send(params);
@@ -116,9 +118,9 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <button onClick={this.goLogin}>Login to Bexio</button>
-        {this.state.AccessToken ? <button onClick={this.getArticles}>Get Articles</button> : null}
-        {this.state.AccessToken ? <button onClick={this.getTimesheets}>Get Timesheets</button> : null}
+        <button className='button' onClick={this.goLogin}>Login to Bexio</button>
+        {this.state.AccessToken ? <button className='button' onClick={this.getArticles}>Get Articles</button> : null}
+        {this.state.AccessToken ? <button className='button' onClick={this.getTimesheets}>Get Timesheets</button> : null}
       </div>
     );
   }
