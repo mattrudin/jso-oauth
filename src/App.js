@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import './App.css';
-import {JSO} from 'jso';
+import { generateState } from './utils/utils';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ClientID: '2997263914.apps.bexio.com',
-      ClientSecret: 'WquLo3P4/XiAaG6qvRMi117uQdg=',
+      ClientID: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+      ClientSecret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+      State: '',
       AccessToken: '',
       Organisation: ''
     };
@@ -25,23 +26,34 @@ class App extends Component {
     );
   }
 
+  //alternative to goLogin with JSO library
   goLogin() {
-    let jso = new JSO({
-        providerID: "bexio",
-        client_id: this.state.ClientID,
-        redirect_uri: "http://localhost:3000/",
-        authorization: "https://office.bexio.com/oauth/authorize/",
-        scopes: { request: ["article_show", "monitoring_show"]},
-        response_type: 'code',
-        client_secret: this.state.ClientID,
-        token: "https://office.bexio.com/oauth/access_token/",
-        request: { state: '1234567890'}
-    });
-    jso.getToken();
+    const http = new XMLHttpRequest();
+    const url = 'https://office.bexio.com/oauth/authorize';
+    const redirect_uri = 'http://localhost:3000/';
+    const state = generateState();
+    this.setState({
+      State: state
+    })
+    const scope = 'article_show monitoring_show'
+
+    const params = `client_id=${this.state.ClientID}&redirect_uri=${redirect_uri}&state=${state}&scope=${scope}`;
+    
+    http.open('GET', url, true);
+    
+    http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    
+    http.onreadystatechange = () => {
+      if(http.readyState === 4 && http.status === 200) {
+          window.location = `${url}?${params}`;
+        }
+    }
+    http.send(params);
   }
 
   getAccess() {
     let isCode = window.location.href.match(/code=([^&]*)/);
+    //check state === this.state.State
     if(isCode) {
       clearInterval(this.timerID);
       let code = isCode[0].slice(5);
@@ -61,9 +73,7 @@ class App extends Component {
     http.open('POST', url, true);
 
     http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    //http.setRequestHeader('Access-Control-Allow-Origin', 'http://localhost:3000'); does not work
-    //http.withCredentials = true;
-
+    
     http.onreadystatechange = () => {
         if(http.readyState === 4 && http.status === 200) {
             const json = JSON.parse(http.responseText);
