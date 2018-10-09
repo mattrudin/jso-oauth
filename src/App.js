@@ -1,19 +1,20 @@
 import React, { Component } from 'react';
 import './App.css';
-import { generateState } from './utils/utils';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ClientID: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-      ClientSecret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+      ClientID: '2997263914.apps.bexio.com',
+      ClientSecret: 'WquLo3P4/XiAaG6qvRMi117uQdg=',
       State: '',
       AccessToken: '',
       Organisation: ''
     };
 
+    this.generateState = this.generateState.bind(this);
     this.goLogin = this.goLogin.bind(this);
+    this.getAccess = this.getAccess.bind(this);
     this.getAccessToken = this.getAccessToken.bind(this);
     this.getArticles = this.getArticles.bind(this);
     this.getTimesheets = this.getTimesheets.bind(this);
@@ -26,15 +27,23 @@ class App extends Component {
     );
   }
 
-  //alternative to goLogin with JSO library
+  generateState() {
+    const validChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const UintArray = new Uint8Array(40);
+    window.crypto.getRandomValues(UintArray);
+    const array = UintArray.map(x => validChars.charCodeAt(x % validChars.length));
+    const randomState = String.fromCharCode.apply(null, array);
+    this.setState({
+      State: randomState
+    });
+    return randomState;
+  };
+
   goLogin() {
     const http = new XMLHttpRequest();
     const url = 'https://office.bexio.com/oauth/authorize';
     const redirect_uri = 'http://localhost:3000/';
-    const state = generateState();
-    this.setState({
-      State: state
-    })
+    const state = this.generateState();
     const scope = 'article_show monitoring_show'
 
     const params = `client_id=${this.state.ClientID}&redirect_uri=${redirect_uri}&state=${state}&scope=${scope}`;
@@ -53,11 +62,14 @@ class App extends Component {
 
   getAccess() {
     let isCode = window.location.href.match(/code=([^&]*)/);
-    //check state === this.state.State
     if(isCode) {
-      clearInterval(this.timerID);
-      let code = isCode[0].slice(5);
-      this.getAccessToken(code);
+      const state = window.location.href.match(/state=([^&]*)/)[1];
+      //state check does not work: this.setState at generateState does nothing??
+      //if(this.state.State === state) {
+        clearInterval(this.timerID);
+        let code = isCode[1];
+        this.getAccessToken(code);
+      //}
     }
   }
 
